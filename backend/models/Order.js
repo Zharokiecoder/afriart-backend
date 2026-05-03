@@ -3,8 +3,11 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
+  },
+  buyer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
   items: [{
     artwork: {
@@ -36,9 +39,9 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    default: 'stripe'
+    default: 'paystack'
   },
-  stripePaymentId: String,
+  paymentReference: String,
   orderStatus: {
     type: String,
     enum: ['processing', 'shipped', 'delivered', 'cancelled'],

@@ -4,6 +4,9 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const http = require('http');
 const socketIo = require('socket.io');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 
 // Load environment variables
 dotenv.config();
@@ -14,7 +17,7 @@ const server = http.createServer(app);
 // CORS configuration for production
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://afriartmarketplace.vercel.app/',  // ⬅️ ADD YOUR VERCEL URL
+  'https://afriartmarketplace.vercel.app',
   'https://afriart-marketplace.vercel.app',
   process.env.CLIENT_URL
 ].filter(Boolean);
@@ -49,9 +52,20 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
+app.use(helmet());
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(mongoSanitize());
+
+// Rate limiting for auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // limit each IP to 20 requests per window
+  message: { message: 'Too many requests, please try again later.' }
+});
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -65,6 +79,7 @@ app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/artist', require('./routes/artist'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Socket.io for Real-time Messaging
 const messageHandler = require('./socket/messageHandler');

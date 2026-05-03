@@ -3,8 +3,8 @@ const router = express.Router();
 const {
   createOrder,
   getUserOrders,
-  getOrderById,
-  processPayment,
+  initializePayment,
+  verifyPayment,
   updateOrderStatus,
   getAllOrders
 } = require('../controllers/orderController');
@@ -13,8 +13,10 @@ const { protect, isAdmin } = require('../middleware/auth');
 // All order routes require authentication
 router.post('/', protect, createOrder);
 router.get('/myorders', protect, getUserOrders);
-router.get('/:id', protect, getOrderById);
-router.post('/payment', protect, processPayment);
+
+// Paystack payment routes
+router.post('/pay/initialize', protect, initializePayment);
+router.get('/pay/verify/:reference', protect, verifyPayment);
 
 // Admin routes
 router.get('/', protect, isAdmin, getAllOrders);
