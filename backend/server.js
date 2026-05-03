@@ -19,6 +19,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://afriartmarketplace.vercel.app',
   'https://afriart-marketplace.vercel.app',
+  'https://afriartshop.vercel.app',
   process.env.CLIENT_URL
 ].filter(Boolean);
 
