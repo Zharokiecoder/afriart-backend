@@ -12,6 +12,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1); // Required for rate-limiting behind Render's proxy
 const server = http.createServer(app);
 
 // CORS configuration for production
